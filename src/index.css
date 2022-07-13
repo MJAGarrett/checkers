@@ -8,10 +8,14 @@
 
 body {
   box-sizing: border-box;
-  margin: 0;
+  margin: auto;
   padding: 0;
+  background-color: seashell;
 }
 
+.game {
+  margin-top: 100px;
+}
 /* Game Board and Squares 
 ------------------------------- */
 .game-board {
@@ -29,7 +33,7 @@ body {
 }
 .square {
   background: beige;
-  border: 2px solid #999;
+  border: 2px solid darkslategray;
   float: left;
   font-size: 40px;
   font-weight: bold;
@@ -56,9 +60,12 @@ body {
 
 /* Status Area
 ----------------------------------------- */
+.status-area {
+  margin: auto;
+}
 .grid-container {
-  background-color: seashell;
-  border: 1px solid #999;
+  background-color: snow;
+  border: 2px solid darkslategray;
   display: grid;
   margin: auto;
   grid-template-columns: 1fr 1fr;
@@ -72,13 +79,15 @@ body {
 }
 .grid-item h3 {
   font-size: 30px;
-  border-bottom: 1px solid #999;
+  border-bottom: 1px solid darkslategray;
 }
 .grid-item p {
-  padding: 10px;
+  margin: 5px 0;
+  padding: 5x;
+  font-size: 20px;
 }
 .grid-item:nth-of-type(1) {
-  border-right: 2px solid #999;
+  border-right: 2px solid darkslategray;
 }
 .inactive {
   color: lightgray;
@@ -94,6 +103,7 @@ body {
   align-items: center;
 }
 .end-move {
+  border: darkslategray 2px solid;
   background-color: hsl(240, 67%, 94%);
   text-align: center;
   text-decoration: none;
@@ -116,6 +126,7 @@ body {
   align-items: center;
 }
 .restart {
+  border: darkslategray 2px solid;
   background-color: hsl(240, 67%, 94%);
   text-align: center;
   text-decoration: none;
@@ -124,6 +135,6 @@ body {
   font-size: 20px;
 }
 .restart:hover {
-  background-color: hsl(240, 67%, 95%);
+  background-color: hsl(240, 67%, 90%);
   box-shadow: 7px 7px 8px -8px;
 }
