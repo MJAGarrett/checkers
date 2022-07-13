@@ -179,11 +179,12 @@ class Game extends React.Component {
     };
   }
   checkDoubleMove(index) {
-    if (!this.canJump(index)) {
+    if (!this.canJump(index) || this.state.onDoubleTurn) {
       this.setState({
         whoseTurn:
           this.state.whoseTurn === blackPieces ? whitePieces : blackPieces,
         currentSelection: null,
+        onDoubleTurn: false,
       });
     } else {
       this.setState({
@@ -397,7 +398,6 @@ class Game extends React.Component {
                 this.setState({
                   history: history.concat([{ squares: squares }]),
                   stepNumber: history.length,
-                  onDoubleTurn: false,
                 });
                 this.checkDoubleMove(i);
               }
@@ -417,7 +417,6 @@ class Game extends React.Component {
                 this.setState({
                   history: history.concat([{ squares: squares }]),
                   stepNumber: history.length,
-                  onDoubleTurn: false,
                 });
                 this.checkDoubleMove(i);
               }
@@ -436,7 +435,6 @@ class Game extends React.Component {
                 this.setState({
                   history: history.concat([{ squares: squares }]),
                   stepNumber: history.length,
-                  onDoubleTurn: false,
                 });
                 this.checkDoubleMove(i);
               }
@@ -455,7 +453,6 @@ class Game extends React.Component {
                 this.setState({
                   history: history.concat([{ squares: squares }]),
                   stepNumber: history.length,
-                  onDoubleTurn: false,
                 });
                 this.checkDoubleMove(i);
               }
@@ -471,6 +468,14 @@ class Game extends React.Component {
       whoseTurn:
         this.state.whoseTurn === blackPieces ? whitePieces : blackPieces,
       currentSelection: null,
+    });
+  }
+  restartGame() {
+    this.setState({
+      stepNumber: 0,
+      currentSelection: null,
+      whoseTurn: blackPieces,
+      onDoubleTurn: false,
     });
   }
 
@@ -490,6 +495,11 @@ class Game extends React.Component {
           />
         </div>
         {statusDisplay}
+        <div className="restart-wrapper">
+          <button className="restart" onClick={() => this.restartGame()}>
+            Restart the game.
+          </button>
+        </div>
         <EndMove
           onDoubleMove={this.state.onDoubleTurn}
           onClick={(i) => this.endMoveClick(i)}
@@ -500,7 +510,7 @@ class Game extends React.Component {
 }
 
 function EndMove(props) {
-  if (/*props.onDoubleMove*/ true) {
+  if (props.onDoubleMove) {
     return (
       <div className="end-move-wrapper">
         <button className="end-move" onClick={props.onClick}>

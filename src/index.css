@@ -12,11 +12,16 @@ body {
   padding: 0;
 }
 
+/* Game Board and Squares 
+------------------------------- */
 .game-board {
   margin: auto;
   width: fit-content;
 }
-
+.board-row {
+  display: flex;
+  flex-direction: row;
+}
 .board-row:after {
   clear: both;
   content: "";
@@ -24,9 +29,9 @@ body {
 }
 .square {
   background: beige;
-  border: 1px solid #999;
+  border: 2px solid #999;
   float: left;
-  font-size: 50px;
+  font-size: 40px;
   font-weight: bold;
   line-height: 60px;
   height: 60px;
@@ -43,13 +48,14 @@ body {
 .square:hover {
   background-color: slateblue;
 }
-.board-row .game {
-  display: flex;
-  flex-direction: row;
-}
+
 .selected {
-  background-color: blue;
+  background-color: slategrey;
+  border: 2px solid red;
 }
+
+/* Status Area
+----------------------------------------- */
 .grid-container {
   background-color: seashell;
   border: 1px solid #999;
@@ -74,10 +80,12 @@ body {
 .grid-item:nth-of-type(1) {
   border-right: 2px solid #999;
 }
-
 .inactive {
   color: lightgray;
 }
+
+/* End Move Button
+------------------ */
 .end-move-wrapper {
   display: flex;
   margin: auto;
@@ -94,6 +102,28 @@ body {
   font-size: 20px;
 }
 .end-move:hover {
+  background-color: hsl(240, 67%, 95%);
+  box-shadow: 7px 7px 8px -8px;
+}
+
+/* Restart Button
+--------------------- */
+.restart-wrapper {
+  display: flex;
+  margin: auto;
+  margin-top: 20px;
+  max-width: 472px;
+  align-items: center;
+}
+.restart {
+  background-color: hsl(240, 67%, 94%);
+  text-align: center;
+  text-decoration: none;
+  padding: 3px;
+  margin: auto;
+  font-size: 20px;
+}
+.restart:hover {
   background-color: hsl(240, 67%, 95%);
   box-shadow: 7px 7px 8px -8px;
 }
