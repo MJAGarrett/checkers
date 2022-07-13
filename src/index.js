@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import StatusArea from "./StatusArea";
 
+// Game Logic Constants
 const whitePieces = ["w", "kw"];
 const blackPieces = ["b", "kb"];
 const downMovers = ["b", "kb", "kw"];
@@ -179,7 +180,7 @@ class Game extends React.Component {
     };
   }
   checkDoubleMove(index) {
-    if (!this.canJump(index) || this.state.onDoubleTurn) {
+    if (this.canJump(index) === null || this.state.onDoubleTurn) {
       this.setState({
         whoseTurn:
           this.state.whoseTurn === blackPieces ? whitePieces : blackPieces,
@@ -194,6 +195,7 @@ class Game extends React.Component {
     }
   }
 
+  // Returns an array of possible jump moves of piece when called
   canJump(i) {
     const cells = document.querySelectorAll(".game-board button");
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
@@ -202,6 +204,8 @@ class Game extends React.Component {
     let currentPlayerPieces = this.state.whoseTurn;
     let currentOpponentPieces =
       currentPlayerPieces === blackPieces ? whitePieces : blackPieces;
+
+    let possibleMoves = [];
 
     let [jumpUpLeft, jumpUpRight, jumpDownLeft, jumpDownRight] = [
       cells[i - 14],
@@ -222,47 +226,54 @@ class Game extends React.Component {
     // i is used for checking a jump as a first move, the state is used when checking for a possible double jump.
 
     if (
-      (downMovers.includes(squares[this.state.currentSelection]) ||
-        downMovers.includes(squares[i])) &&
-      i + 14 <= 63
+      downMovers.includes(squares[this.state.currentSelection]) ||
+      downMovers.includes(squares[i])
     ) {
-      if (
-        currentOpponentPieces.includes(downLeft.textContent) &&
-        jumpDownLeft.textContent === "" &&
-        jumpDownLeft.classList.contains("no-pieces") !== true
-      ) {
-        return true;
-      } else if (i + 18 <= 63) {
+      if (i + 14 <= 63) {
+        if (
+          currentOpponentPieces.includes(downLeft.textContent) &&
+          jumpDownLeft.textContent === "" &&
+          jumpDownLeft.classList.contains("no-pieces") !== true
+        ) {
+          possibleMoves.push(i + 14);
+        }
+      }
+      if (i + 18 <= 63) {
         if (
           currentOpponentPieces.includes(downRight.textContent) &&
           jumpDownRight.textContent === "" &&
           jumpDownRight.classList.contains("no-pieces") !== true
         ) {
-          return true;
+          possibleMoves.push(i + 18);
         }
       }
     }
     if (
-      (upMovers.includes(squares[this.state.currentSelection]) ||
-        upMovers.includes(squares[i])) &&
-      i - 14 >= 0
+      upMovers.includes(squares[this.state.currentSelection]) ||
+      upMovers.includes(squares[i])
     ) {
-      if (
-        currentOpponentPieces.includes(upLeft.textContent) &&
-        jumpUpLeft.textContent === "" &&
-        jumpUpLeft.classList.contains("no-pieces") !== true
-      ) {
-        return true;
-      } else if (i - 18 >= 0) {
+      if (i - 14 >= 0) {
+        if (
+          currentOpponentPieces.includes(upLeft.textContent) &&
+          jumpUpLeft.textContent === "" &&
+          jumpUpLeft.classList.contains("no-pieces") !== true
+        ) {
+          possibleMoves.push(i - 14);
+        }
+      }
+      if (i - 18 >= 0) {
         if (
           currentOpponentPieces.includes(upRight.textContent) &&
           jumpUpRight.textContent === "" &&
           jumpUpRight.classList.contains("no-pieces") !== true
         ) {
-          return true;
+          possibleMoves.push(i - 18);
         }
       }
     }
+    if (possibleMoves.length > 0) {
+      return possibleMoves;
+    } else return null;
   }
 
   kingPiece(checker, i) {
@@ -281,6 +292,8 @@ class Game extends React.Component {
     const current = history[history.length - 1];
     const squares = current.squares.slice();
 
+    let possibleMoves = [];
+
     let [upLeft, upRight, downLeft, downRight] = [
       cells[i - 7],
       cells[i - 9],
@@ -288,176 +301,118 @@ class Game extends React.Component {
       cells[i + 9],
     ];
 
-    if (squares[i] === "kb" || squares[i] === "kw") {
+    if (downMovers.includes(squares[i])) {
       if (i + 7 <= 63) {
         if (
-          (downLeft.textContent === "" &&
-            downLeft.classList.contains("no-pieces") !== true) ||
-          (downRight.textContent === "" &&
-            downRight.classList.contains("no-pieces") !== true)
+          downLeft.textContent === "" &&
+          downLeft.classList.contains("no-pieces") !== true
         ) {
-          return true;
+          possibleMoves.push(i + 7);
         }
-      } else if (i - 7 >= 0) {
+      }
+      if (i + 9 <= 63) {
         if (
-          (upLeft.textContent === "" &&
-            upLeft.classList.contains("no-pieces") !== true) ||
-          (upRight.textContent === "" &&
-            upRight.classList.contains("no-pieces") !== true)
+          downRight.textContent === "" &&
+          downRight.classList.contains("no-pieces") !== true
         ) {
-          return true;
+          possibleMoves.push(i + 9);
         }
       }
     }
-    if (squares[i] === "b" && i + 7 <= 63) {
-      if (
-        (downLeft.textContent === "" &&
-          downLeft.classList.contains("no-pieces") !== true) ||
-        (downRight.textContent === "" &&
-          downRight.classList.contains("no-pieces") !== true)
-      ) {
-        return true;
+    if (upMovers.includes(squares[i])) {
+      if (i - 7 >= 0) {
+        if (
+          upLeft.textContent === "" &&
+          upLeft.classList.contains("no-pieces") !== true
+        ) {
+          possibleMoves.push(i - 7);
+        }
+      }
+      if (i - 9 >= 0) {
+        if (
+          upRight.textContent === "" &&
+          upRight.classList.contains("no-pieces") !== true
+        ) {
+          possibleMoves.push(i - 9);
+        }
       }
     }
-    if (squares[i] === "w" && i - 7 >= 0) {
-      if (
-        (upLeft.textContent === "" &&
-          upLeft.classList.contains("no-pieces") !== true) ||
-        (upRight.textContent === "" &&
-          upRight.classList.contains("no-pieces") !== true)
-      ) {
-        return true;
-      }
-    }
+    if (possibleMoves.length > 0) {
+      return possibleMoves;
+    } else return null;
   }
 
   handleClick(i) {
-    const cells = document.querySelectorAll("button");
     console.log(i);
     console.log(this.state.currentSelection);
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     let currentPlayerPieces = this.state.whoseTurn;
-    let currentOpponentPieces =
-      this.state.whoseTurn === blackPieces ? whitePieces : blackPieces;
     let checkerIndex = this.state.currentSelection;
     let checker = squares[checkerIndex];
 
     console.log(this.state);
 
-    if (!checkerIndex) {
+    if (!checkerIndex && !this.state.gameOver) {
       if (!squares[i] || !currentPlayerPieces.includes(squares[i])) {
         alert("Can't select");
-      } else if (this.canMove(i) || this.canJump(i)) {
+      } else if (this.canMove(i) !== null || this.canJump(i) !== null) {
         this.setState({ currentSelection: i });
-        // cells[i].classList.add("selected");
       }
     }
     // The above if makes sure only valid pieces are selected
-    // The below if handles all movement.
+    // The below if allows removing a selection if a capture has not been made.
     else {
       if (i === checkerIndex && this.state.onDoubleTurn !== true) {
         this.setState({ currentSelection: null });
-        // cells[i].classList.remove("selected");
       }
-      // The above if resets selection when clicking on selected checker
+      // The below if series handles movement
       else if (currentPlayerPieces.includes(checker)) {
         if (!squares[i]) {
           // The below if handles moving into empty space
-          if (
-            ((checker === "b" || checker === "kb" || checker === "kw") &&
-              this.state.onDoubleTurn !== true &&
-              cells[i].classList.contains("no-pieces") !== true &&
-              (i === checkerIndex + 7 || i === checkerIndex + 9)) ||
-            ((checker === "w" || checker === "kb" || checker === "kw") &&
-              this.state.onDoubleTurn !== true &&
-              cells[i].classList.contains("no-pieces") !== true &&
-              (i === checkerIndex - 7 || i === checkerIndex - 9))
-          ) {
-            squares[i] = this.kingPiece(checker, i);
-            squares[checkerIndex] = null;
-            this.setState({
-              history: history.concat([{ squares: squares }]),
-              stepNumber: history.length,
-              whoseTurn:
-                this.state.whoseTurn === blackPieces
-                  ? whitePieces
-                  : blackPieces,
-              currentSelection: null,
-            });
+          if (this.canMove(checkerIndex) !== null) {
+            // The above if statement is to prevent a minor error if possible moves is null.
+            if (this.canMove(checkerIndex).includes(i)) {
+              squares[i] = this.kingPiece(checker, i);
+              squares[checkerIndex] = null;
+              this.setState({
+                history: history.concat([{ squares: squares }]),
+                stepNumber: history.length,
+                whoseTurn:
+                  this.state.whoseTurn === blackPieces
+                    ? whitePieces
+                    : blackPieces,
+                currentSelection: null,
+              });
+            }
           }
-          // Updates board if black captures a piece to its lower left
-          if (checker === "b" || checker === "kb" || checker === "kw") {
-            if (
-              i === checkerIndex + 14 &&
-              cells[i].classList.contains("no-pieces") !== true
-            ) {
-              if (currentOpponentPieces.includes(squares[checkerIndex + 7])) {
-                squares[i] = this.kingPiece(checker, i);
-                squares[checkerIndex] = null;
+          // Updates board if a capture occurs.
+          if (this.canJump(checkerIndex) !== null) {
+            // The above if statement is to prevent a minor error if possible jumps is null.
+            if (this.canJump(checkerIndex).includes(i)) {
+              let moveTaken = this.canJump(checkerIndex).find(
+                (val) => val === i
+              );
+              squares[i] = this.kingPiece(checker, i);
+              squares[checkerIndex] = null;
+
+              // Checks if the checker jumped and eliminates the opponents checker
+              if (moveTaken - checkerIndex === 14) {
                 squares[checkerIndex + 7] = null;
-                this.setState({
-                  history: history.concat([{ squares: squares }]),
-                  stepNumber: history.length,
-                });
-                this.checkDoubleMove(i);
-              }
-            }
-          }
-          // Updates Board if black captures a piece to its lower right
-          if (checker === "b" || checker === "kb" || checker === "kw") {
-            if (
-              i === checkerIndex + 18 &&
-              cells[i].classList.contains("no-pieces") !== true
-            ) {
-              if (currentOpponentPieces.includes(squares[checkerIndex + 9])) {
-                squares[i] = this.kingPiece(checker, i);
-                squares[checkerIndex] = null;
+              } else if (moveTaken - checkerIndex === 18) {
                 squares[checkerIndex + 9] = null;
-                console.log(this.state);
-                this.setState({
-                  history: history.concat([{ squares: squares }]),
-                  stepNumber: history.length,
-                });
-                this.checkDoubleMove(i);
-              }
-            }
-          }
-          // Updates Board if white captures a piece to its upper left
-          if (checker === "w" || checker === "kb" || checker === "kw") {
-            if (
-              i === checkerIndex - 14 &&
-              cells[i].classList.contains("no-pieces") !== true
-            ) {
-              if (currentOpponentPieces.includes(squares[checkerIndex - 7])) {
-                squares[i] = this.kingPiece(checker, i);
-                squares[checkerIndex] = null;
+              } else if (moveTaken - checkerIndex === -14) {
                 squares[checkerIndex - 7] = null;
-                this.setState({
-                  history: history.concat([{ squares: squares }]),
-                  stepNumber: history.length,
-                });
-                this.checkDoubleMove(i);
-              }
-            }
-          }
-          // Updates Board if white captures a piece to its upper right
-          if (checker === "w" || checker === "kb" || checker === "kw") {
-            if (
-              i === checkerIndex - 18 &&
-              cells[i].classList.contains("no-pieces") !== true
-            ) {
-              if (currentOpponentPieces.includes(squares[checkerIndex - 9])) {
-                squares[i] = this.kingPiece(checker, i);
-                squares[checkerIndex] = null;
+              } else if (moveTaken - checkerIndex === -18) {
                 squares[checkerIndex - 9] = null;
-                this.setState({
-                  history: history.concat([{ squares: squares }]),
-                  stepNumber: history.length,
-                });
-                this.checkDoubleMove(i);
               }
+
+              this.setState({
+                history: history.concat([{ squares: squares }]),
+                stepNumber: history.length,
+              });
+              this.checkDoubleMove(i);
             }
           }
         }
