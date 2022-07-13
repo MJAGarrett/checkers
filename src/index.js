@@ -12,15 +12,23 @@ const upMovers = ["w", "kb", "kw"];
 function Square(props) {
   // The className let is there to capture and apply a class of "selected" if the current square is selected.
   let className = "";
+
+  // The below let and two ifs are there purely to eliminate possible empty space in the
+  // class list in the DOM by removing empty space in the below string literals.
+  // They are purely cosmetic, as spaces in the aforementioned string literals would suffice, but leave
+  // empty space within the class list as revealed by a browser inspection.
+  let noPieces = "";
+  if (props.noPieces === "no-pieces") {
+    noPieces = " " + props.noPieces;
+  }
   if (props.className) {
-    className = props.className;
+    className = " " + props.className;
   }
   // Returns a button with class name of "occupied" and content of whichever piece is on it or a button with null content and appropriate class names.
-  // NTS: I could probably eliminate the space in the class name of the by writing a ternary within the string literal that provides its own space
   if (props.pieceType) {
     return (
       <button
-        className={`square ${props.blackOrWhite} occupied ${className}`}
+        className={`square occupied ${props.blackOrWhite}${className}`}
         onClick={props.onClick}
       >
         {props.pieceType}
@@ -29,7 +37,7 @@ function Square(props) {
   } else {
     return (
       <button
-        className={`square ${props.blackOrWhite} ${props.noPieces} ${className}`}
+        className={`square ${props.blackOrWhite}${noPieces}${className}`}
         onClick={props.onClick}
       >
         {props.pieceType}
