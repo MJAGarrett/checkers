@@ -170,93 +170,16 @@ class Game extends React.Component {
     };
   }
   checkDoubleMove(index) {
-    console.log("checkDoubleMove called");
-    const cells = document.querySelectorAll("button");
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length - 1];
-    const squares = current.squares.slice();
-
-    if (this.state.whoseTurn === "b") {
-      if (index + 14 > 63) {
-        this.setState({
-          whoseTurn: this.state.whoseTurn === "w" ? "b" : "w",
-          currentSelection: null,
-        });
-        return;
-      } else if (
-        cells[index + 14].classList.contains("no-pieces") !== true &&
-        squares[index + 7] === "w" &&
-        !squares[index + 14]
-      ) {
-        this.setState({
-          onDoubleTurn: true,
-          currentSelection: index,
-        });
-        return;
-      }
-      if (index + 18 > 63) {
-        this.setState({
-          whoseTurn: this.state.whoseTurn === "w" ? "b" : "w",
-          currentSelection: null,
-        });
-        return;
-      } else if (
-        cells[index + 18].classList.contains("no-pieces") !== true &&
-        squares[index + 9] === "w" &&
-        !squares[index + 18]
-      ) {
-        this.setState({
-          onDoubleTurn: true,
-          currentSelection: index,
-        });
-        return;
-      }
+    if (!this.canJump(index)) {
       this.setState({
         whoseTurn: this.state.whoseTurn === "w" ? "b" : "w",
         currentSelection: null,
       });
-      return;
-    }
-    if (this.state.whoseTurn === "w") {
-      if (index - 14 < 0) {
-        this.setState({
-          whoseTurn: this.state.whoseTurn === "w" ? "b" : "w",
-          currentSelection: null,
-        });
-        return;
-      } else if (
-        cells[index - 14].classList.contains("no-pieces") !== true &&
-        squares[index - 7] === "b" &&
-        !squares[index - 14]
-      ) {
-        this.setState({
-          onDoubleTurn: true,
-          currentSelection: index,
-        });
-        return;
-      }
-      if (index - 18 < 0) {
-        this.setState({
-          whoseTurn: this.state.whoseTurn === "w" ? "b" : "w",
-          currentSelection: null,
-        });
-        return;
-      } else if (
-        cells[index - 18].classList.contains("no-pieces") !== true &&
-        squares[index - 9] === "b" &&
-        !squares[index - 18]
-      ) {
-        this.setState({
-          onDoubleTurn: true,
-          currentSelection: index,
-        });
-        return;
-      }
+    } else {
       this.setState({
-        whoseTurn: this.state.whoseTurn === "w" ? "b" : "w",
-        currentSelection: null,
+        onDoubleTurn: true,
+        currentSelection: index,
       });
-      return;
     }
   }
 
@@ -280,7 +203,14 @@ class Game extends React.Component {
       cells[i + 9],
     ];
 
-    if (squares[i] === "b" && i + 14 <= 63) {
+    // Both square[i] and square[this.state.currentSelection] are needed below as when checkDoubleMove()
+    // is called the piece has not yet rendered to the event index yet.
+    // i is used for checking a jump as a first move, the state is used when checking for a possible double jump.
+
+    if (
+      (squares[this.state.currentSelection] === "b" || squares[i] === "b") &&
+      i + 14 <= 63
+    ) {
       if (
         downLeft.textContent === "w" &&
         jumpDownLeft.textContent === "" &&
@@ -295,7 +225,10 @@ class Game extends React.Component {
         return true;
       }
     }
-    if (squares[i] === "w" && i - 14 >= 0) {
+    if (
+      (squares[this.state.currentSelection] === "w" || squares[i] === "w") &&
+      i - 14 >= 0
+    ) {
       if (
         upLeft.textContent === "b" &&
         jumpUpLeft.textContent === "" &&
