@@ -3,6 +3,11 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import StatusArea from "./StatusArea";
 
+const whitePieces = ["w", "kw"];
+const blackPieces = ["b", "kb"];
+const downMovers = ["b", "kb", "kw"];
+const upMovers = ["w", "kb", "kw"];
+
 function Square(props) {
   let className = "";
   if (props.className) {
@@ -154,6 +159,10 @@ const boardStart = () => {
   return updated;
 };
 
+// const testBoard = Array(64);
+// const testIt = testBoard.fill("kw", 23, 24);
+// const testy = testIt.fill("kb", 35, 36);
+
 class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -165,14 +174,15 @@ class Game extends React.Component {
       ],
       stepNumber: 0,
       currentSelection: null,
-      whoseTurn: `b`,
+      whoseTurn: blackPieces,
       onDoubleTurn: false,
     };
   }
   checkDoubleMove(index) {
     if (!this.canJump(index)) {
       this.setState({
-        whoseTurn: this.state.whoseTurn === "w" ? "b" : "w",
+        whoseTurn:
+          this.state.whoseTurn === blackPieces ? whitePieces : blackPieces,
         currentSelection: null,
       });
     } else {
@@ -188,6 +198,9 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
+    let currentPlayerPieces = this.state.whoseTurn;
+    let currentOpponentPieces =
+      currentPlayerPieces === blackPieces ? whitePieces : blackPieces;
 
     let [jumpUpLeft, jumpUpRight, jumpDownLeft, jumpDownRight] = [
       cells[i - 14],
@@ -208,40 +221,56 @@ class Game extends React.Component {
     // i is used for checking a jump as a first move, the state is used when checking for a possible double jump.
 
     if (
-      (squares[this.state.currentSelection] === "b" || squares[i] === "b") &&
+      (downMovers.includes(squares[this.state.currentSelection]) ||
+        downMovers.includes(squares[i])) &&
       i + 14 <= 63
     ) {
       if (
-        downLeft.textContent === "w" &&
+        currentOpponentPieces.includes(downLeft.textContent) &&
         jumpDownLeft.textContent === "" &&
         jumpDownLeft.classList.contains("no-pieces") !== true
       ) {
         return true;
-      } else if (
-        downRight.textContent === "w" &&
-        jumpDownRight.textContent === "" &&
-        jumpDownRight.classList.contains("no-pieces") !== true
-      ) {
-        return true;
+      } else if (i + 18 <= 63) {
+        if (
+          currentOpponentPieces.includes(downRight.textContent) &&
+          jumpDownRight.textContent === "" &&
+          jumpDownRight.classList.contains("no-pieces") !== true
+        ) {
+          return true;
+        }
       }
     }
     if (
-      (squares[this.state.currentSelection] === "w" || squares[i] === "w") &&
+      (upMovers.includes(squares[this.state.currentSelection]) ||
+        upMovers.includes(squares[i])) &&
       i - 14 >= 0
     ) {
       if (
-        upLeft.textContent === "b" &&
+        currentOpponentPieces.includes(upLeft.textContent) &&
         jumpUpLeft.textContent === "" &&
         jumpUpLeft.classList.contains("no-pieces") !== true
       ) {
         return true;
-      } else if (
-        upRight.textContent === "b" &&
-        jumpUpRight.textContent === "" &&
-        jumpUpRight.classList.contains("no-pieces") !== true
-      ) {
-        return true;
+      } else if (i - 18 >= 0) {
+        if (
+          currentOpponentPieces.includes(upRight.textContent) &&
+          jumpUpRight.textContent === "" &&
+          jumpUpRight.classList.contains("no-pieces") !== true
+        ) {
+          return true;
+        }
       }
+    }
+  }
+
+  kingPiece(checker, i) {
+    if (checker === "b" && i >= 56) {
+      return "kb";
+    } else if (checker === "w" && i <= 7) {
+      return "kw";
+    } else {
+      return checker;
     }
   }
 
@@ -258,6 +287,27 @@ class Game extends React.Component {
       cells[i + 9],
     ];
 
+    if (squares[i] === "kb" || squares[i] === "kw") {
+      if (i + 7 <= 63) {
+        if (
+          (downLeft.textContent === "" &&
+            downLeft.classList.contains("no-pieces") !== true) ||
+          (downRight.textContent === "" &&
+            downRight.classList.contains("no-pieces") !== true)
+        ) {
+          return true;
+        }
+      } else if (i - 7 >= 0) {
+        if (
+          (upLeft.textContent === "" &&
+            upLeft.classList.contains("no-pieces") !== true) ||
+          (upRight.textContent === "" &&
+            upRight.classList.contains("no-pieces") !== true)
+        ) {
+          return true;
+        }
+      }
+    }
     if (squares[i] === "b" && i + 7 <= 63) {
       if (
         (downLeft.textContent === "" &&
@@ -287,13 +337,14 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
+    let currentPlayerPieces = this.state.whoseTurn;
     let checkerIndex = this.state.currentSelection;
     let checker = squares[checkerIndex];
 
     console.log(this.state);
 
     if (!checkerIndex) {
-      if (!squares[i] || squares[i] !== this.state.whoseTurn) {
+      if (!squares[i] || !currentPlayerPieces.includes(squares[i])) {
         alert("Can't select");
       } else if (this.canMove(i) || this.canJump(i)) {
         this.setState({ currentSelection: i });
@@ -301,42 +352,46 @@ class Game extends React.Component {
       }
     }
     // The above if makes sure only valid pieces are selected
+    // The below if handles all movement.
     else {
       if (i === checkerIndex && this.state.onDoubleTurn !== true) {
         this.setState({ currentSelection: null });
         // cells[i].classList.remove("selected");
       }
       // The above if resets selection when clicking on selected checker
-      else if (checker === this.state.whoseTurn) {
+      else if (currentPlayerPieces.includes(checker)) {
         if (!squares[i]) {
           // The below if handles moving into empty space
           if (
-            (checker === "b" &&
+            ((checker === "b" || checker === "kb" || checker === "kw") &&
               this.state.onDoubleTurn !== true &&
               cells[i].classList.contains("no-pieces") !== true &&
               (i === checkerIndex + 7 || i === checkerIndex + 9)) ||
-            (checker === "w" &&
+            ((checker === "w" || checker === "kb" || checker === "kw") &&
               this.state.onDoubleTurn !== true &&
               cells[i].classList.contains("no-pieces") !== true &&
               (i === checkerIndex - 7 || i === checkerIndex - 9))
           ) {
-            squares[i] = checker;
+            squares[i] = this.kingPiece(checker, i);
             squares[checkerIndex] = null;
             this.setState({
               history: history.concat([{ squares: squares }]),
               stepNumber: history.length,
-              whoseTurn: this.state.whoseTurn === "w" ? "b" : "w",
+              whoseTurn:
+                this.state.whoseTurn === blackPieces
+                  ? whitePieces
+                  : blackPieces,
               currentSelection: null,
             });
           }
           // Updates board if black captures a piece to its lower left
-          if (checker === "b") {
+          if (checker === "b" || checker === "kb" || checker === "kw") {
             if (
               i === checkerIndex + 14 &&
               cells[i].classList.contains("no-pieces") !== true
             ) {
-              if (squares[checkerIndex + 7] === "w") {
-                squares[i] = checker;
+              if (!currentPlayerPieces.includes(squares[checkerIndex + 7])) {
+                squares[i] = this.kingPiece(checker, i);
                 squares[checkerIndex] = null;
                 squares[checkerIndex + 7] = null;
                 this.setState({
@@ -349,13 +404,13 @@ class Game extends React.Component {
             }
           }
           // Updates Board if black captures a piece to its lower right
-          if (checker === "b") {
+          if (checker === "b" || checker === "kb" || checker === "kw") {
             if (
               i === checkerIndex + 18 &&
               cells[i].classList.contains("no-pieces") !== true
             ) {
-              if (squares[checkerIndex + 9] === "w") {
-                squares[i] = checker;
+              if (!currentPlayerPieces.includes(squares[checkerIndex + 9])) {
+                squares[i] = this.kingPiece(checker, i);
                 squares[checkerIndex] = null;
                 squares[checkerIndex + 9] = null;
                 console.log(this.state);
@@ -369,13 +424,13 @@ class Game extends React.Component {
             }
           }
           // Updates Board if white captures a piece to its upper left
-          if (checker === "w") {
+          if (checker === "w" || checker === "kb" || checker === "kw") {
             if (
               i === checkerIndex - 14 &&
               cells[i].classList.contains("no-pieces") !== true
             ) {
-              if (squares[checkerIndex - 7] === "b") {
-                squares[i] = checker;
+              if (!currentPlayerPieces.includes(squares[checkerIndex - 7])) {
+                squares[i] = this.kingPiece(checker, i);
                 squares[checkerIndex] = null;
                 squares[checkerIndex - 7] = null;
                 this.setState({
@@ -388,13 +443,13 @@ class Game extends React.Component {
             }
           }
           // Updates Board if white captures a piece to its upper right
-          if (checker === "w") {
+          if (checker === "w" || checker === "kb" || checker === "kw") {
             if (
               i === checkerIndex - 18 &&
               cells[i].classList.contains("no-pieces") !== true
             ) {
-              if (squares[checkerIndex - 9] === "b") {
-                squares[i] = checker;
+              if (!currentPlayerPieces.includes(squares[checkerIndex - 9])) {
+                squares[i] = this.kingPiece(checker, i);
                 squares[checkerIndex] = null;
                 squares[checkerIndex - 9] = null;
                 this.setState({
@@ -413,7 +468,8 @@ class Game extends React.Component {
   endMoveClick() {
     this.setState({
       onDoubleTurn: false,
-      whoseTurn: this.state.whoseTurn === "w" ? "b" : "w",
+      whoseTurn:
+        this.state.whoseTurn === blackPieces ? whitePieces : blackPieces,
       currentSelection: null,
     });
   }
@@ -422,6 +478,7 @@ class Game extends React.Component {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     let statusDisplay = StatusArea(current.squares, this.state.whoseTurn);
+    console.log(this.state.whoseTurn);
 
     return (
       <div className="game">
@@ -443,7 +500,7 @@ class Game extends React.Component {
 }
 
 function EndMove(props) {
-  if (props.onDoubleMove) {
+  if (/*props.onDoubleMove*/ true) {
     return (
       <div className="end-move-wrapper">
         <button className="end-move" onClick={props.onClick}>
