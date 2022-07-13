@@ -339,6 +339,8 @@ class Game extends React.Component {
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     let currentPlayerPieces = this.state.whoseTurn;
+    let currentOpponentPieces =
+      this.state.whoseTurn === blackPieces ? whitePieces : blackPieces;
     let checkerIndex = this.state.currentSelection;
     let checker = squares[checkerIndex];
 
@@ -391,7 +393,7 @@ class Game extends React.Component {
               i === checkerIndex + 14 &&
               cells[i].classList.contains("no-pieces") !== true
             ) {
-              if (!currentPlayerPieces.includes(squares[checkerIndex + 7])) {
+              if (currentOpponentPieces.includes(squares[checkerIndex + 7])) {
                 squares[i] = this.kingPiece(checker, i);
                 squares[checkerIndex] = null;
                 squares[checkerIndex + 7] = null;
@@ -409,7 +411,7 @@ class Game extends React.Component {
               i === checkerIndex + 18 &&
               cells[i].classList.contains("no-pieces") !== true
             ) {
-              if (!currentPlayerPieces.includes(squares[checkerIndex + 9])) {
+              if (currentOpponentPieces.includes(squares[checkerIndex + 9])) {
                 squares[i] = this.kingPiece(checker, i);
                 squares[checkerIndex] = null;
                 squares[checkerIndex + 9] = null;
@@ -428,7 +430,7 @@ class Game extends React.Component {
               i === checkerIndex - 14 &&
               cells[i].classList.contains("no-pieces") !== true
             ) {
-              if (!currentPlayerPieces.includes(squares[checkerIndex - 7])) {
+              if (currentOpponentPieces.includes(squares[checkerIndex - 7])) {
                 squares[i] = this.kingPiece(checker, i);
                 squares[checkerIndex] = null;
                 squares[checkerIndex - 7] = null;
@@ -446,7 +448,7 @@ class Game extends React.Component {
               i === checkerIndex - 18 &&
               cells[i].classList.contains("no-pieces") !== true
             ) {
-              if (!currentPlayerPieces.includes(squares[checkerIndex - 9])) {
+              if (currentOpponentPieces.includes(squares[checkerIndex - 9])) {
                 squares[i] = this.kingPiece(checker, i);
                 squares[checkerIndex] = null;
                 squares[checkerIndex - 9] = null;
