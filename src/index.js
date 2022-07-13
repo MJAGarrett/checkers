@@ -177,6 +177,7 @@ class Game extends React.Component {
       currentSelection: null,
       whoseTurn: blackPieces,
       onDoubleTurn: false,
+      gameOver: false,
     };
   }
   checkDoubleMove(index) {
@@ -433,13 +434,38 @@ class Game extends React.Component {
       currentSelection: null,
       whoseTurn: blackPieces,
       onDoubleTurn: false,
+      gameOver: false,
     });
   }
+  calculateWinner(board) {
+    // Counts the pieces remaining
+    let numBlackPieces = 0;
+    let numWhitePieces = 0;
+    board.forEach((val) => {
+      if (blackPieces.includes(val)) {
+        numBlackPieces++;
+      } else if (whitePieces.includes(val)) {
+        numWhitePieces++;
+      }
+    });
 
+    // Checks if any player has been eliminated.
+    if (numBlackPieces === 0) {
+      alert("White Wins!");
+      this.setState({ gameOver: true });
+    } else if (numWhitePieces === 0) {
+      alert("Black Wins!");
+      this.setState({ gameOver: true });
+    }
+  }
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     let statusDisplay = StatusArea(current.squares, this.state.whoseTurn);
+    // Check for a winner. Need to limit it with !this.state.gameOver to avoid an infinite loop.
+    if (!this.state.gameOver) {
+      this.calculateWinner(current.squares);
+    }
     console.log(this.state.whoseTurn);
 
     return (
