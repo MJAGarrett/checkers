@@ -1,3 +1,9 @@
+/* Notes to Self/ToDo Section 07/13/22:
+1. Need to restrict selection of pieces if a jump is available. Potentially through a jumpAvailable State.
+2. Need to create a settings area to change mustJumpIfAvailable and moreThanTwoJumpsAllowed.
+3. Need to add a win condition if a player cannot move.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -190,7 +196,13 @@ const boardStart = () => {
   return updated;
 };
 
+/* Testing board states
+------------------------------------------------*/
 // const testBoard = Array(64);
+// const surroundTest = testBoard
+//   .fill("kw", 1, 2)
+//   .fill("kb", 8, 9)
+//   .fill("kb", 17, 18);
 // const testIt = testBoard.fill("kw", 23, 24);
 // const testy = testIt.fill("kb", 35, 36);
 
@@ -210,13 +222,19 @@ class Game extends React.Component {
       whoseTurn: blackPieces,
       onDoubleTurn: false,
       gameOver: false,
+      mustJumpIfAvailable: false,
+      moreThanTwoJumps: false,
     };
   }
 
   // Checks whether a piece can capture another piece after first capture and sets state appropriately.
   checkDoubleMove(index) {
-    if (this.canJump(index) === null || this.state.onDoubleTurn) {
-      // If cannot jump another piece or has already jumped twice, end turn and remove selection.
+    if (
+      this.canJump(index).length === 0 ||
+      (!this.moreThanTwoJumps && this.state.onDoubleTurn)
+    ) {
+      // If cannot jump another piece or both has already jumped twice
+      // and more than two jumps are NOT allowed, end turn and remove selection.
       this.setState({
         whoseTurn:
           this.state.whoseTurn === blackPieces ? whitePieces : blackPieces,
@@ -318,9 +336,7 @@ class Game extends React.Component {
         }
       }
     }
-    if (possibleMoves.length > 0) {
-      return possibleMoves;
-    } else return null;
+    return possibleMoves;
   }
 
   // Checks if a basic checker is at the appropriate end of the board for kinging
@@ -397,10 +413,7 @@ class Game extends React.Component {
         }
       }
     }
-    // Return possible moves if there are any, otherwise return null.
-    if (possibleMoves.length > 0) {
-      return possibleMoves;
-    } else return null;
+    return possibleMoves;
   }
 
   handleClick(i) {
@@ -422,9 +435,11 @@ class Game extends React.Component {
       if (!squares[i] || !currentPlayerPieces.includes(squares[i])) {
         alert("Can't select");
       }
+      // NTS: An if preventing selection if another piece can jump could go here.
+
       // Checks if the square's piece can move or jump another piece. If it can
       // then select it by updating state, otherwise do nothing.
-      else if (this.canMove(i) !== null || this.canJump(i) !== null) {
+      else if (this.canMove(i).length > 0 || this.canJump(i).length > 0) {
         this.setState({ currentSelection: i });
       }
     }
@@ -437,14 +452,15 @@ class Game extends React.Component {
       // The below if series handles movement
       else if (currentPlayerPieces.includes(checker)) {
         if (!squares[i]) {
-          // The below if handles moving into empty space
-          if (this.canMove(checkerIndex) !== null) {
-            // The above if statement is to prevent a minor error if canMove returns null and the next
-            // if statement tries to read null as an array.
-
-            // NTS: If I change canMove to return an empty array and not null on no moves
-            // I can possibly remove the if above. Can probably replace the above if test with one of canJump
-            // to prevent a move if the checker can jump another piece.
+          /* 
+            The below if handles moving into empty space.
+            If the game forces jumps and the piece selected can jump, then movement not allowed.
+            Otherwise can move as normal.
+          */
+          if (
+            !this.state.mustJumpIfAvailable ||
+            this.canJump(checkerIndex).length === 0
+          ) {
             if (this.canMove(checkerIndex).includes(i)) {
               // Moves piece into square and checks if it should be a king.
               squares[i] = this.kingPiece(checker, i);
@@ -463,40 +479,31 @@ class Game extends React.Component {
             }
           }
           // Updates board if a capture occurs.
-          if (this.canJump(checkerIndex) !== null) {
-            // The above if statement is to prevent a minor error if canJump returns null and the next
-            // if statement tries to read null as an array.
+          if (this.canJump(checkerIndex).includes(i)) {
+            // Saves index of move for reference.
+            let moveTaken = this.canJump(checkerIndex).find((val) => val === i);
+            // Moves piece into square and kings it if it should be kinged.
+            squares[i] = this.kingPiece(checker, i);
+            squares[checkerIndex] = null;
 
-            // NTS: If I change canJump to return an empty array and not null on no moves
-            // I can possibly remove the if above.
-            if (this.canJump(checkerIndex).includes(i)) {
-              // Saves index of move for reference.
-              let moveTaken = this.canJump(checkerIndex).find(
-                (val) => val === i
-              );
-              // Moves piece into square and kings it if it should be kinged.
-              squares[i] = this.kingPiece(checker, i);
-              squares[checkerIndex] = null;
-
-              // Checks if the checker jumped and eliminates the opponent's checker
-              if (moveTaken - checkerIndex === 14) {
-                squares[checkerIndex + 7] = null;
-              } else if (moveTaken - checkerIndex === 18) {
-                squares[checkerIndex + 9] = null;
-              } else if (moveTaken - checkerIndex === -14) {
-                squares[checkerIndex - 7] = null;
-              } else if (moveTaken - checkerIndex === -18) {
-                squares[checkerIndex - 9] = null;
-              }
-
-              // Sets history but does not change or remove selection. Calls checkDoubleMove()
-              // which is responsible for those changes.
-              this.setState({
-                history: history.concat([{ squares: squares }]),
-                stepNumber: history.length,
-              });
-              this.checkDoubleMove(i);
+            // Checks if the checker jumped and eliminates the opponent's checker
+            if (moveTaken - checkerIndex === 14) {
+              squares[checkerIndex + 7] = null;
+            } else if (moveTaken - checkerIndex === 18) {
+              squares[checkerIndex + 9] = null;
+            } else if (moveTaken - checkerIndex === -14) {
+              squares[checkerIndex - 7] = null;
+            } else if (moveTaken - checkerIndex === -18) {
+              squares[checkerIndex - 9] = null;
             }
+
+            // Sets history but does not change or remove selection. Calls checkDoubleMove()
+            // which is responsible for those changes.
+            this.setState({
+              history: history.concat([{ squares: squares }]),
+              stepNumber: history.length,
+            });
+            this.checkDoubleMove(i);
           }
         }
       }
@@ -597,7 +604,6 @@ function EndMove(props) {
     );
   }
 }
-
 // --------------------------------------------------------
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
