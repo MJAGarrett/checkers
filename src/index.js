@@ -569,6 +569,7 @@ class Game extends React.Component {
 
     return (
       <div className="game">
+        <h1 className="title">Checkers</h1>
         <div className="game-board">
           <Board
             selectedSquare={this.state.currentSelection}

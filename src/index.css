@@ -14,7 +14,12 @@ body {
 }
 
 .game {
-  margin-top: 100px;
+  margin-top: auto;
+  text-align: center;
+}
+h1 {
+  font-size: 50px;
+  margin: 25px auto;
 }
 /* Game Board and Squares 
 ------------------------------- */
