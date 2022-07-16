@@ -18,8 +18,8 @@ body {
   text-align: center;
 }
 h1 {
-  font-size: 50px;
-  margin: 25px auto;
+  font-size: 30px;
+  margin: 15px auto;
 }
 /* Game Board and Squares 
 ------------------------------- */
@@ -40,15 +40,14 @@ h1 {
   background: beige;
   border: 2px solid darkslategray;
   float: left;
-  font-size: 40px;
+  font-size: 16px;
   font-weight: bold;
-  line-height: 60px;
-  height: 60px;
+  height: 30px;
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
   text-align: center;
-  width: 60px;
+  width: 30px;
 }
 .second {
   background: lightsalmon;
@@ -75,7 +74,7 @@ h1 {
   margin: auto;
   grid-template-columns: 1fr 1fr;
   justify-items: stretch;
-  max-width: 472px;
+  max-width: 260px;
 }
 .grid-item {
   margin: 0;
@@ -83,13 +82,13 @@ h1 {
   text-align: center;
 }
 .grid-item h3 {
-  font-size: 30px;
+  font-size: 25px;
   border-bottom: 1px solid darkslategray;
 }
 .grid-item p {
   margin: 5px 0;
   padding: 5x;
-  font-size: 20px;
+  font-size: 16px;
 }
 .grid-item:nth-of-type(1) {
   border-right: 2px solid darkslategray;
@@ -102,8 +101,7 @@ h1 {
 ------------------ */
 .end-move-wrapper {
   display: flex;
-  margin: auto;
-  margin-top: 20px;
+  margin: 20px auto;
   max-width: 472px;
   align-items: center;
 }
@@ -125,9 +123,7 @@ h1 {
 --------------------- */
 .restart-wrapper {
   display: flex;
-  margin: auto;
-  margin-top: 20px;
-  max-width: 472px;
+  margin: 20px auto;
   align-items: center;
 }
 .restart {
@@ -143,3 +139,97 @@ h1 {
   background-color: hsl(240, 67%, 90%);
   box-shadow: 7px 7px 8px -8px;
 }
+
+/* Responsive Design Area
+----------------------------------------------------------------------- */
+@media screen and (min-width: 350px) {
+  .square {
+    font-size: 20px;
+    height: 40px;
+    width: 40px;
+  }
+  .grid-container {
+    max-width: 312px;
+  }
+}
+@media screen and (min-width: 500px) {
+  h1 {
+    font-size: 50px;
+    margin: 25px auto;
+  }
+  .square {
+    font-size: 40px;
+    height: 60px;
+    width: 60px;
+  }
+  .grid-container {
+    max-width: 472px;
+  }
+  .grid-item h3 {
+    font-size: 30px;
+  }
+  .grid-item p {
+    font-size: 20px;
+  }
+}
+@media screen and (min-width: 800px) {
+  .square {
+    font-size: 45px;
+    height: 75px;
+    width: 75px;
+  }
+  .status-area {
+    max-width: 600px;
+    margin: auto;
+    margin-top: 20px;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .game {
+    display: flex;
+    justify-content: center;
+  }
+  .right-content {
+    justify-self: flex-start;
+    margin: 20px;
+    margin-bottom: auto;
+    margin-top: 100px;
+    min-width: 325px;
+    max-height: min-content;
+    background: rgba(211, 211, 211, 0.7);
+    border-radius: 2em;
+  }
+  .left-content {
+    margin: auto 0;
+    margin-left: 75px;
+  }
+  .square {
+    font-size: 60px;
+    height: 90px;
+    width: 90px;
+  }
+  .status-area {
+    margin: auto;
+    margin-top: 20px;
+  }
+  .restart {
+    border: none;
+    background: none;
+    text-align: center;
+    text-decoration: none;
+    padding: 3px;
+    margin: auto;
+    font-size: 20px;
+    transition: font-size 0.5s ease-in-out;
+  }
+  .restart:hover {
+    background: none;
+    box-shadow: none;
+    font-size: 1.5em;
+    transition: font-size 0.3s both ease-in-out;
+  }
+}
+
+/* KeyFrame Animations
+---------------------------------- */

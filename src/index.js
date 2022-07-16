@@ -569,24 +569,28 @@ class Game extends React.Component {
 
     return (
       <div className="game">
-        <h1 className="title">Checkers</h1>
-        <div className="game-board">
-          <Board
-            selectedSquare={this.state.currentSelection}
-            squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
+        <div className="left-content">
+          <h1 className="title">Checkers</h1>
+          <div className="game-board">
+            <Board
+              selectedSquare={this.state.currentSelection}
+              squares={current.squares}
+              onClick={(i) => this.handleClick(i)}
+            />
+          </div>
+          {statusDisplay}
+        </div>
+        <div className="right-content">
+          <div className="restart-wrapper">
+            <button className="restart" onClick={() => this.restartGame()}>
+              Restart the game.
+            </button>
+          </div>
+          <EndMove
+            onDoubleMove={this.state.onDoubleTurn}
+            onClick={(i) => this.endMoveClick(i)}
           />
         </div>
-        {statusDisplay}
-        <div className="restart-wrapper">
-          <button className="restart" onClick={() => this.restartGame()}>
-            Restart the game.
-          </button>
-        </div>
-        <EndMove
-          onDoubleMove={this.state.onDoubleTurn}
-          onClick={(i) => this.endMoveClick(i)}
-        />
       </div>
     );
   }
