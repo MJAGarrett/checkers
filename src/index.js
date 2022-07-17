@@ -569,6 +569,7 @@ class Game extends React.Component {
 
     return (
       <div className="game">
+        <h1>Checkers</h1>
         <div className="left-content">
           <div className="game-board">
             <Board
@@ -577,8 +578,8 @@ class Game extends React.Component {
               onClick={(i) => this.handleClick(i)}
             />
           </div>
-          {statusDisplay}
         </div>
+        {statusDisplay}
         <div className="right-content">
           <div className="restart-wrapper">
             <button className="restart" onClick={() => this.restartGame()}>
