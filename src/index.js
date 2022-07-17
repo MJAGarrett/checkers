@@ -570,7 +570,6 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="left-content">
-          <h1 className="title">Checkers</h1>
           <div className="game-board">
             <Board
               selectedSquare={this.state.currentSelection}
@@ -601,7 +600,7 @@ class Game extends React.Component {
 function EndMove(props) {
   if (props.onDoubleMove) {
     return (
-      <div className="end-move-wrapper">
+      <div className="end-move-wrapper" style={{ maxWidth: "325px" }}>
         <button className="end-move" onClick={props.onClick}>
           End turn without a double move.
         </button>

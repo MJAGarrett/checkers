@@ -18,6 +18,7 @@ body {
   text-align: center;
 }
 h1 {
+  text-align: center;
   font-size: 30px;
   margin: 15px auto;
 }
@@ -192,9 +193,8 @@ h1 {
   }
   .right-content {
     justify-self: flex-start;
-    margin: 20px;
+    margin: 0 20px auto 20px;
     margin-bottom: auto;
-    margin-top: 100px;
     min-width: 325px;
     max-height: min-content;
     background: rgba(211, 211, 211, 0.7);
@@ -216,11 +216,6 @@ h1 {
   .restart {
     border: none;
     background: none;
-    text-align: center;
-    text-decoration: none;
-    padding: 3px;
-    margin: auto;
-    font-size: 20px;
     transition: font-size 0.5s ease-in-out;
   }
   .restart:hover {
@@ -229,6 +224,28 @@ h1 {
     font-size: 1.5em;
     transition: font-size 0.3s both ease-in-out;
   }
+  .end-move {
+    border: none;
+    background: none;
+    transition: font-size 0.5s ease-in-out;
+  }
+  .end-move:hover {
+    background: none;
+    box-shadow: none;
+    font-size: 1.5em;
+    transition: font-size 0.3s both ease-in-out;
+  }
+  /* .end-move {
+    text-align: center;
+    text-decoration: none;
+    padding: 3px;
+    margin: auto;
+    font-size: 20px;
+  }
+  .end-move:hover {
+    background-color: hsl(240, 67%, 95%);
+    box-shadow: 7px 7px 8px -8px; 
+  }*/
 }
 
 /* KeyFrame Animations
