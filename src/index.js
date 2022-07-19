@@ -1,7 +1,9 @@
 /* Notes to Self/ToDo Section 07/13/22:
 1. Need to restrict selection of pieces if a jump is available. Potentially through a jumpAvailable State.
 2. Need to create a settings area to change mustJumpIfAvailable and moreThanTwoJumpsAllowed.
-3. Need to add a win condition if a player cannot move.
+3. Need to add a win condition if a player cannot move. ------------------------------------------------------------- Done
+4. Would be nice to add move highlighting.
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 import React from "react";
@@ -536,11 +538,34 @@ class Game extends React.Component {
     // Counts the pieces remaining
     let numBlackPieces = 0;
     let numWhitePieces = 0;
-    board.forEach((val) => {
+    let possibleMovesBlack = [];
+    let possibleMovesWhite = [];
+
+    board.forEach((val, index) => {
       if (blackPieces.includes(val)) {
         numBlackPieces++;
+        console.log(index);
+        console.log(val);
+
+        // The four If statements below exist to prevent adding an empty array to the possibleMoves
+        // arrays above and increasing their length such that the if statements checking
+        // for lose conditions below incorrectly evaluate a lost game as as still playable as a
+        // result of arrays of +0 length containing empty, nested arrays.
+
+        if (this.canMove(index).length > 0) {
+          possibleMovesBlack.push(this.canMove(index));
+        }
+        if (this.canJump(index).length > 0) {
+          possibleMovesBlack.push(this.canJump(index));
+        }
       } else if (whitePieces.includes(val)) {
         numWhitePieces++;
+        if (this.canMove(index).length > 0) {
+          possibleMovesWhite.push(this.canMove(index));
+        }
+        if (this.canJump(index).length > 0) {
+          possibleMovesWhite.push(this.canJump(index));
+        }
       }
     });
 
@@ -551,6 +576,20 @@ class Game extends React.Component {
     } else if (numWhitePieces === 0) {
       alert("Black Wins!");
       this.setState({ gameOver: true });
+    } else if (
+      (this.state.whoseTurn === blackPieces &&
+        possibleMovesBlack.length === 0) ||
+      (this.state.whoseTurn === whitePieces && possibleMovesWhite.length === 0)
+    ) {
+      if (numWhitePieces > numBlackPieces) {
+        alert("White Wins!");
+        this.setState({ gameOver: true });
+      } else if (numWhitePieces < numBlackPieces) {
+        alert("Black Wins!");
+        this.setState({ gameOver: true });
+      } else {
+        alert("Tie! Now, how did that happen?");
+      }
     }
   }
   render() {
@@ -561,10 +600,6 @@ class Game extends React.Component {
     // and the amount of checkers each player has remaining.
     let statusDisplay = StatusArea(current.squares, this.state.whoseTurn);
 
-    // Check for a winner. Need to limit it with !this.state.gameOver to avoid an infinite loop.
-    if (!this.state.gameOver) {
-      this.calculateWinner(current.squares);
-    }
     console.log(this.state.whoseTurn);
 
     return (
@@ -593,6 +628,19 @@ class Game extends React.Component {
         </div>
       </div>
     );
+  }
+
+  // Runs on updates after initial render.
+  // Moved calculateWinner here to allow for DOM selection in
+  // the canJump and canMove functions called within calculateWinner.
+  componentDidUpdate() {
+    const history = this.state.history;
+    const current = history[this.state.stepNumber];
+
+    // Check for a winner. Need to limit it with !this.state.gameOver to avoid an infinite loop.
+    if (!this.state.gameOver) {
+      this.calculateWinner(current.squares);
+    }
   }
 }
 
