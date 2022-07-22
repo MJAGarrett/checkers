@@ -23,8 +23,8 @@ function Square(props) {
 
   // The below let and two ifs are there purely to eliminate possible empty space in the
   // class list in the DOM by removing empty space in the below string literals.
-  // They are purely cosmetic, as spaces in the aforementioned string literals would suffice, but leave
-  // empty space within the class list as revealed by a browser inspection.
+  // They are purely cosmetic, as spaces in the aforementioned string literals would suffice, but would
+  // leave empty space within the class list that would show in a browser inspector.
   let noPieces = "";
   if (props.noPieces === "no-pieces") {
     noPieces = " " + props.noPieces;
@@ -199,14 +199,15 @@ const boardStart = () => {
 };
 
 /* Testing board states
+------------------------------------------------
+const testBoard = Array(64);
+const surroundTest = testBoard
+  .fill("kw", 1, 2)
+  .fill("kb", 8, 9)
+  .fill("kb", 17, 18);
+const testIt = testBoard.fill("kw", 23, 24);
+const testy = testIt.fill("kb", 35, 36);
 ------------------------------------------------*/
-// const testBoard = Array(64);
-// const surroundTest = testBoard
-//   .fill("kw", 1, 2)
-//   .fill("kb", 8, 9)
-//   .fill("kb", 17, 18);
-// const testIt = testBoard.fill("kw", 23, 24);
-// const testy = testIt.fill("kb", 35, 36);
 
 class Game extends React.Component {
   constructor(props) {
@@ -265,15 +266,15 @@ class Game extends React.Component {
     let possibleMoves = [];
 
     let [jumpUpLeft, jumpUpRight, jumpDownLeft, jumpDownRight] = [
-      cells[i - 14],
       cells[i - 18],
+      cells[i - 14],
       cells[i + 14],
       cells[i + 18],
     ];
 
     let [upLeft, upRight, downLeft, downRight] = [
-      cells[i - 7],
       cells[i - 9],
+      cells[i - 7],
       cells[i + 7],
       cells[i + 9],
     ];
@@ -313,28 +314,24 @@ class Game extends React.Component {
       upMovers.includes(squares[this.state.currentSelection]) ||
       upMovers.includes(squares[i])
     ) {
-      // Due to an accident, jumpUpLeft and upLeft both correspond to movements to the right.
-      // However, as the internal logic is consistent (if counter to common sense), there is no problem in running the code.
-      // It is merely a nomenclature error.
-
-      // Up Right.
-      if (i - 14 >= 0) {
+      // Up Left.
+      if (i - 18 >= 0) {
         if (
           currentOpponentPieces.includes(upLeft.textContent) &&
           jumpUpLeft.textContent === "" &&
           jumpUpLeft.classList.contains("no-pieces") !== true
         ) {
-          possibleMoves.push(i - 14);
+          possibleMoves.push(i - 18);
         }
       }
-      // Up Left
-      if (i - 18 >= 0) {
+      // Up Right
+      if (i - 14 >= 0) {
         if (
           currentOpponentPieces.includes(upRight.textContent) &&
           jumpUpRight.textContent === "" &&
           jumpUpRight.classList.contains("no-pieces") !== true
         ) {
-          possibleMoves.push(i - 18);
+          possibleMoves.push(i - 14);
         }
       }
     }
@@ -363,8 +360,8 @@ class Game extends React.Component {
     let possibleMoves = [];
 
     let [upLeft, upRight, downLeft, downRight] = [
-      cells[i - 7],
       cells[i - 9],
+      cells[i - 7],
       cells[i + 7],
       cells[i + 9],
     ];
@@ -390,28 +387,25 @@ class Game extends React.Component {
         }
       }
     }
-    // Due to an accident, upLeft corresponds to movement to the right. However, as the
-    // internal logic is consistent (if counter to common sense), there is no problem in running the code.
-    // It is merely a nomenclature error.
 
     // Checks upward movement.
     if (upMovers.includes(squares[i])) {
-      // Up Right
-      if (i - 7 >= 0) {
+      // Up Left
+      if (i - 9 >= 0) {
         if (
           upLeft.textContent === "" &&
           upLeft.classList.contains("no-pieces") !== true
         ) {
-          possibleMoves.push(i - 7);
+          possibleMoves.push(i - 9);
         }
       }
-      // Up Left
-      if (i - 9 >= 0) {
+      // Up Right
+      if (i - 7 >= 0) {
         if (
           upRight.textContent === "" &&
           upRight.classList.contains("no-pieces") !== true
         ) {
-          possibleMoves.push(i - 9);
+          possibleMoves.push(i - 7);
         }
       }
     }
@@ -544,12 +538,12 @@ class Game extends React.Component {
     board.forEach((val, index) => {
       if (blackPieces.includes(val)) {
         numBlackPieces++;
-        console.log(index);
-        console.log(val);
+        console.log(index); // Remove after testing is finished
+        console.log(val); // Remove after testing is finished.
 
         // The four If statements below exist to prevent adding an empty array to the possibleMoves
         // arrays above and increasing their length such that the if statements checking
-        // for lose conditions below incorrectly evaluate a lost game as as still playable as a
+        // for lose conditions below incorrectly evaluate a lost game as still playable as a
         // result of arrays of +0 length containing empty, nested arrays.
 
         if (this.canMove(index).length > 0) {
