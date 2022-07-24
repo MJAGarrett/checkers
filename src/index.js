@@ -127,13 +127,21 @@ class Board extends React.Component {
         // Creates 8 "square" buttons for each row.
         let newSquare = this.renderSquare(r * 8 + c);
 
-        // Below if checks if there is a selected piece and updates classList of square it is on for styling purposes. Otherwise continue as normal.
-        if (this.props.selectedSquare) {
-          if (this.props.selectedSquare === r * 8 + c) {
-            let newestSquare = React.cloneElement(newSquare, {
-              className: "selected",
-            });
-            rowItems.push(newestSquare);
+        // Below if-chain checks whether the square to render should be highlighted.
+        // If it is neither a possible move, nor a selected piece, then continue as normal.
+        if (this.props.highlightedSquares.length > 0) {
+          if (this.props.highlightedSquares.includes(r * 8 + c)) {
+            if (this.props.highlightedSquares[0] === r * 8 + c) {
+              let newestSquare = React.cloneElement(newSquare, {
+                className: "selected",
+              });
+              rowItems.push(newestSquare);
+            } else {
+              let newestSquare = React.cloneElement(newSquare, {
+                className: "highlighted",
+              });
+              rowItems.push(newestSquare);
+            }
           } else {
             rowItems.push(newSquare);
           }
@@ -527,6 +535,17 @@ class Game extends React.Component {
     });
   }
 
+  // Returns an array of with the 0-index being the selected piece and the
+  // other values representing valid moves. These pieces will be styled to
+  // increase visibility.
+  getSquaresToHighlight() {
+    let selectedSquare = [this.state.currentSelection];
+    let moves = this.canJump(this.state.currentSelection).concat(
+      this.canMove(this.state.currentSelection)
+    );
+    return selectedSquare.concat(moves);
+  }
+
   // Checks if a player has won the game.
   calculateWinner(board) {
     // Counts the pieces remaining
@@ -589,6 +608,7 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
+    const squaresToHighlight = this.getSquaresToHighlight();
 
     // Creates a JSX element with the necessary DOM to display whose turn it is
     // and the amount of checkers each player has remaining.
@@ -602,7 +622,7 @@ class Game extends React.Component {
         <div className="left-content">
           <div className="game-board">
             <Board
-              selectedSquare={this.state.currentSelection}
+              highlightedSquares={squaresToHighlight}
               squares={current.squares}
               onClick={(i) => this.handleClick(i)}
             />
